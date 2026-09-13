@@ -1,0 +1,158 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =============================================================================
+   IDENTITÉ VISUELLE — Dahira Asfiyahi Mbour
+   Couleurs dérivées du logo : vert profond, doré en accent.
+   Le doré n'est JAMAIS une couleur de fond de bouton : en aplat sur une grande
+   surface il détruit le contraste, illisible en plein soleil.
+   ============================================================================= */
+
+:root {
+  --radius: 0.75rem;
+
+  --background: oklch(0.99 0.004 106);   /* blanc cassé, jamais blanc pur */
+  --foreground: oklch(0.21 0.01 106);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.01 106);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.01 106);
+
+  /* Vert profond du logo (#0B5D2E) */
+  --primary: oklch(0.40 0.10 155);
+  --primary-foreground: oklch(0.99 0.004 106);
+
+  --secondary: oklch(0.96 0.008 106);
+  --secondary-foreground: oklch(0.28 0.02 155);
+
+  --muted: oklch(0.96 0.008 106);
+  --muted-foreground: oklch(0.50 0.015 106);
+
+  /* Doré (#C9A227) — filets, reçus, distinctions. Pas de bouton plein. */
+  --accent: oklch(0.94 0.04 90);
+  --accent-foreground: oklch(0.35 0.07 85);
+
+  --destructive: oklch(0.55 0.19 27);
+  --destructive-foreground: oklch(0.99 0.004 106);
+
+  --border: oklch(0.90 0.008 106);
+  --input: oklch(0.90 0.008 106);
+  --ring: oklch(0.40 0.10 155);
+
+  --chart-1: oklch(0.40 0.10 155);
+  --chart-2: oklch(0.65 0.12 85);
+  --chart-3: oklch(0.55 0.10 230);
+  --chart-4: oklch(0.60 0.14 25);
+  --chart-5: oklch(0.50 0.08 300);
+
+  --sidebar: oklch(0.99 0.004 106);
+  --sidebar-foreground: oklch(0.21 0.01 106);
+  --sidebar-primary: oklch(0.40 0.10 155);
+  --sidebar-primary-foreground: oklch(0.99 0.004 106);
+  --sidebar-accent: oklch(0.96 0.008 106);
+  --sidebar-accent-foreground: oklch(0.28 0.02 155);
+  --sidebar-border: oklch(0.90 0.008 106);
+  --sidebar-ring: oklch(0.40 0.10 155);
+}
+
+/* Mode sombre défini pour compatibilité, non activé en v1 :
+   l'application s'utilise en extérieur, en plein jour. */
+.dark {
+  --background: oklch(0.17 0.01 155);
+  --foreground: oklch(0.97 0.004 106);
+  --card: oklch(0.22 0.015 155);
+  --card-foreground: oklch(0.97 0.004 106);
+  --popover: oklch(0.22 0.015 155);
+  --popover-foreground: oklch(0.97 0.004 106);
+  --primary: oklch(0.62 0.12 155);
+  --primary-foreground: oklch(0.15 0.02 155);
+  --secondary: oklch(0.28 0.02 155);
+  --secondary-foreground: oklch(0.97 0.004 106);
+  --muted: oklch(0.28 0.02 155);
+  --muted-foreground: oklch(0.70 0.015 106);
+  --accent: oklch(0.30 0.03 90);
+  --accent-foreground: oklch(0.90 0.06 90);
+  --destructive: oklch(0.65 0.17 27);
+  --destructive-foreground: oklch(0.15 0.02 155);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.62 0.12 155);
+  --sidebar: oklch(0.22 0.015 155);
+  --sidebar-foreground: oklch(0.97 0.004 106);
+  --sidebar-primary: oklch(0.62 0.12 155);
+  --sidebar-primary-foreground: oklch(0.15 0.02 155);
+  --sidebar-accent: oklch(0.28 0.02 155);
+  --sidebar-accent-foreground: oklch(0.97 0.004 106);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.62 0.12 155);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* 16px minimum : contrainte du cahier des charges, lisibilité en extérieur */
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Les montants en FCFA : chiffres à chasse fixe pour que les colonnes
+     s'alignent dans les listes et les bilans. */
+  .montant {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  /* Empêche iOS de zoomer au focus d'un champ : le zoom automatique
+     désoriente complètement sur un formulaire de saisie rapide. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
