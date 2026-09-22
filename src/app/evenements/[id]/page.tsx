@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import { formaterMontant, nomAffiche } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { BoutonPdf } from '@/components/bouton-pdf'
+import { BoutonCloturer } from './bouton-cloturer'
+
 export const metadata = { title: 'Événement' }
 
 const dateLongue = new Intl.DateTimeFormat('fr-FR', {
@@ -123,6 +125,7 @@ export default async function PageEvenement({ params }: { params: Promise<{ id: 
   const moi = await exigerRole(['president', 'tresorier', 'secretaire', 'commissaire'])
   const peutEncaisser = aRole(moi, ['president', 'tresorier'])
   const voitFinances = aRole(moi, ['president', 'tresorier', 'commissaire'])
+  const estPresident = aRole(moi, ['president'])
   const { id } = await params
 
   const supabase = await createClient()
@@ -290,7 +293,7 @@ export default async function PageEvenement({ params }: { params: Promise<{ id: 
         </div>
       )}
 
-            {cartes}
+      {cartes}
 
       {voitFinances && (
         <section className="mb-8 rounded-xl border p-4">
@@ -318,6 +321,7 @@ export default async function PageEvenement({ params }: { params: Promise<{ id: 
           </div>
         </section>
       )}
+
       {membres}
 
       {voitFinances && (
@@ -363,6 +367,8 @@ export default async function PageEvenement({ params }: { params: Promise<{ id: 
           )}
         </section>
       )}
+
+      {estPresident && !evt.cloture && <BoutonCloturer evenementId={evt.id} titre={evt.titre} />}
     </main>
   )
 }

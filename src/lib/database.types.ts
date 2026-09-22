@@ -1066,6 +1066,8 @@ export type Database = {
           budget: number | null
           caisse_id: string | null
           cloture: boolean
+          cloture_le: string | null
+          cloture_par: string | null
           contribution_par_membre: number | null
           cree_le: string
           cree_par: string
@@ -1086,6 +1088,8 @@ export type Database = {
           budget?: number | null
           caisse_id?: string | null
           cloture?: boolean
+          cloture_le?: string | null
+          cloture_par?: string | null
           contribution_par_membre?: number | null
           cree_le?: string
           cree_par: string
@@ -1106,6 +1110,8 @@ export type Database = {
           budget?: number | null
           caisse_id?: string | null
           cloture?: boolean
+          cloture_le?: string | null
+          cloture_par?: string | null
           contribution_par_membre?: number | null
           cree_le?: string
           cree_par?: string
@@ -1135,6 +1141,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_soldes_caisses"
             referencedColumns: ["caisse_id"]
+          },
+          {
+            foreignKeyName: "evenements_cloture_par_fkey"
+            columns: ["cloture_par"]
+            isOneToOne: false
+            referencedRelation: "membres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evenements_cloture_par_fkey"
+            columns: ["cloture_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "evenements_cloture_par_fkey"
+            columns: ["cloture_par"]
+            isOneToOne: false
+            referencedRelation: "v_situation_membres"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "evenements_cree_par_fkey"
@@ -2381,6 +2408,10 @@ export type Database = {
           report: number
           reste: number
         }[]
+      }
+      cloturer_evenement: {
+        Args: { p_evenement_id: string }
+        Returns: undefined
       }
       creer_compte_membre: {
         Args: {

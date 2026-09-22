@@ -17,7 +17,8 @@ export default async function PageConnexion({
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Image
-            src="/logo.png"
+            src="/logo-dahira.png"
+            unoptimized
             alt="Logo du Dahira Asfiyahi de Mbour"
             width={160}
             height={160}

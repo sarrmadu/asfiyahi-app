@@ -36,14 +36,11 @@ const heure = new Intl.DateTimeFormat('fr-FR', {
   timeZone: 'Africa/Dakar',
 })
 
-let logoEnCache: Uint8Array | null = null
 async function chargerLogo(origine: string): Promise<Uint8Array | null> {
-  if (logoEnCache) return logoEnCache
   try {
-    const rep = await fetch(new URL('/logo.png', origine))
+    const rep = await fetch(new URL('/logo-dahira.png', origine), { cache: 'no-store' })
     if (!rep.ok) return null
-    logoEnCache = new Uint8Array(await rep.arrayBuffer())
-    return logoEnCache
+    return new Uint8Array(await rep.arrayBuffer())
   } catch {
     return null
   }
