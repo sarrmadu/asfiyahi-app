@@ -4,7 +4,7 @@ import { exigerRole } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { formaterMontant } from '@/lib/format'
 import { FormulaireMembre } from '../formulaire'
-
+import { AccesMembre } from './acces'
 export const metadata = { title: 'Fiche membre' }
 
 export default async function PageFicheMembre({
@@ -75,6 +75,8 @@ export default async function PageFicheMembre({
           </div>
         </div>
       )}
+
+      <AccesMembre membreId={membre.id} aUnAcces={!!membre.user_id} telephone={membre.telephone} />
 
       <FormulaireMembre
         membre={membre}

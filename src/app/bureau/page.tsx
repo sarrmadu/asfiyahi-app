@@ -167,9 +167,9 @@ export default async function PageBureau() {
             {nbDeclarations?.count} paiement{(nbDeclarations?.count ?? 0) > 1 ? 's' : ''} mobile
             money à valider
           </p>
-          <p className="text-sm text-muted-foreground">
-            L&apos;écran de validation arrive à l&apos;étape suivante.
-          </p>
+            <Link href="/declarations" className="mt-3 block">
+            <Button className="h-12 w-full text-base">Voir et valider</Button>
+          </Link>
         </section>
       )}
 

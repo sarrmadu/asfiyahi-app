@@ -341,6 +341,7 @@ export type Database = {
           dahira_id: string
           date_paiement: string
           ecriture_id: string | null
+          evenement_id: string | null
           id: string
           membre_id: string
           mode: Database["public"]["Enums"]["mode_paiement"]
@@ -358,6 +359,7 @@ export type Database = {
           dahira_id: string
           date_paiement: string
           ecriture_id?: string | null
+          evenement_id?: string | null
           id?: string
           membre_id: string
           mode: Database["public"]["Enums"]["mode_paiement"]
@@ -375,6 +377,7 @@ export type Database = {
           dahira_id?: string
           date_paiement?: string
           ecriture_id?: string | null
+          evenement_id?: string | null
           id?: string
           membre_id?: string
           mode?: Database["public"]["Enums"]["mode_paiement"]
@@ -420,6 +423,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_ecritures_effectives"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "declarations_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "evenements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "declarations_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "declarations_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
           },
           {
             foreignKeyName: "declarations_membre_id_fkey"
@@ -2386,6 +2410,17 @@ export type Database = {
       }
       dahira_courant: { Args: never; Returns: string }
       debut_cycle_gamou: { Args: { p_evenement_id: string }; Returns: string }
+      declarer_paiement: {
+        Args: {
+          p_commentaire?: string
+          p_date: string
+          p_evenement_id?: string
+          p_mode: Database["public"]["Enums"]["mode_paiement"]
+          p_montant: number
+          p_reference: string
+        }
+        Returns: string
+      }
       encaisser_especes: {
         Args: {
           p_caisse_id: string
@@ -2442,6 +2477,10 @@ export type Database = {
           score: number
           section: string
         }[]
+      }
+      rejeter_declaration: {
+        Args: { p_declaration_id: string; p_motif: string }
+        Returns: undefined
       }
       rejeter_depense: {
         Args: { p_depense_id: string; p_motif: string }

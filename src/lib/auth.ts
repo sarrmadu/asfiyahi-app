@@ -14,16 +14,17 @@ export type MembreCourant = {
   surnom: string | null
   photoUrl: string | null
   roles: RoleType[]
+  /** Mot de passe provisoire donné par le bureau : à remplacer. */
+  doitChangerMdp: boolean
 }
 
 /**
- * Membre connecté et ses rôles, en UNE seule requête.
- * cache() : si plusieurs éléments de la même page le demandent, la base
- * n'est interrogée qu'une fois.
+ * Récupère le membre connecté avec ses rôles, en une seule requête.
+ * `cache` évite de refaire la requête si plusieurs parties de la même page
+ * la demandent.
  */
 export const getMembreCourant = cache(async (): Promise<MembreCourant | null> => {
   const supabase = await createClient()
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -40,7 +41,6 @@ export const getMembreCourant = cache(async (): Promise<MembreCourant | null> =>
   if (!data) return null
 
   const roles = (data.membre_roles as { role: RoleType }[] | null) ?? []
-
   return {
     id: data.id,
     dahiraId: data.dahira_id,
@@ -50,15 +50,26 @@ export const getMembreCourant = cache(async (): Promise<MembreCourant | null> =>
     surnom: data.surnom,
     photoUrl: data.photo_url,
     roles: roles.map((r) => r.role),
+    doitChangerMdp: user.user_metadata?.doit_changer_mdp === true,
   }
 })
 
+/**
+ * Comme getMembreCourant, mais redirige vers /connexion si absent,
+ * et vers /mot-de-passe tant que le mot de passe provisoire n'est pas changé.
+ */
 export async function exigerMembre(): Promise<MembreCourant> {
   const membre = await getMembreCourant()
   if (!membre) redirect('/connexion')
+  if (membre.doitChangerMdp) redirect('/mot-de-passe')
   return membre
 }
 
+/**
+ * Exige au moins un des rôles indiqués.
+ * Le contrôle est aussi appliqué en base par les règles de sécurité : cette
+ * fonction sert à afficher une page d'erreur propre plutôt qu'une liste vide.
+ */
 export async function exigerRole(roles: RoleType[]): Promise<MembreCourant> {
   const membre = await exigerMembre()
   if (!roles.some((r) => membre.roles.includes(r))) {
@@ -76,4 +87,4 @@ export const estBureau = (m: MembreCourant | null) =>
   aRole(m, ['president', 'tresorier', 'secretaire', 'commissaire'])
 
 export const peutEncaisser = (m: MembreCourant | null) =>
-  aRole(m, ['president', 'tresorier'])
+  aRole(m, ['tresorier', 'president'])
