@@ -15,7 +15,10 @@ export const metadata: Metadata = {
     template: '%s · Dahira Asfiyahi',
   },
   description: 'Gestion du Dahira Asfiyahi de Mbour',
-  // Prépare l'installation en PWA (le manifest viendra plus tard)
+  icons: {
+    icon: '/icons/favicon-48.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
   appleWebApp: {
     capable: true,
     title: 'Asfiyahi',
@@ -27,7 +30,6 @@ export const viewport: Viewport = {
   themeColor: '#0B5D2E',
   width: 'device-width',
   initialScale: 1,
-  // On n'interdit PAS le zoom : certains membres en ont besoin pour lire.
   maximumScale: 5,
 }
 
