@@ -7,7 +7,6 @@ export type ResultatEncaissement =
   | { ok: true; numeroRecu: string }
   | { ok: false; erreur: string }
 
-/** Garde-fou contre une faute de frappe : 10 millions de F, en centimes. */
 const MONTANT_MAX = 10_000_000 * 100
 
 export async function encaisser(entree: {
@@ -15,8 +14,9 @@ export async function encaisser(entree: {
   caisseId: string
   montantCentimes: number
   libelle: string
+  evenementId?: string | null
 }): Promise<ResultatEncaissement> {
-  const { membreId, caisseId, montantCentimes, libelle } = entree
+  const { membreId, caisseId, montantCentimes, libelle, evenementId } = entree
 
   if (!membreId || !caisseId) {
     return { ok: false, erreur: 'Choisissez un membre et une caisse.' }
@@ -34,6 +34,7 @@ export async function encaisser(entree: {
     p_caisse_id: caisseId,
     p_montant: montantCentimes,
     p_libelle: libelle.slice(0, 200),
+    ...(evenementId ? { p_evenement_id: evenementId } : {}),
   })
 
   if (error) {
@@ -47,5 +48,6 @@ export async function encaisser(entree: {
 
   revalidatePath('/')
   revalidatePath('/bureau')
+  revalidatePath('/evenements', 'layout')
   return { ok: true, numeroRecu }
 }

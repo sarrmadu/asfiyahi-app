@@ -16,12 +16,12 @@ export default async function PageFicheMembre({
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: membre }, { data: sections }, { data: dahira }, { data: situation }] =
+  const [{ data: membre }, { data: sections }, { data: dahira }, { data: situation }, { data: categories }] =
     await Promise.all([
       supabase
         .from('membres')
         .select(
-          'id, numero_membre, prenom, nom, surnom, telephone, section_id, date_adhesion, cotisation_mensuelle, statut, notes, user_id'
+          'id, numero_membre, prenom, nom, surnom, telephone, section_id, categorie_id, date_adhesion, cotisation_mensuelle, statut, notes, user_id'
         )
         .eq('id', id)
         .maybeSingle(),
@@ -32,6 +32,11 @@ export default async function PageFicheMembre({
         .select('total_verse, solde_du')
         .eq('membre_id', id)
         .maybeSingle(),
+      supabase
+        .from('categories_membre')
+        .select('id, nom, cotisation_mensuelle')
+        .eq('actif', true)
+        .order('ordre'),
     ])
 
   if (!membre) notFound()
@@ -74,6 +79,7 @@ export default async function PageFicheMembre({
       <FormulaireMembre
         membre={membre}
         sections={sections ?? []}
+        categories={categories ?? []}
         cotisationDefaut={dahira?.cotisation_defaut ?? 100000}
       />
     </main>

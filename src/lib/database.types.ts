@@ -54,6 +54,13 @@ export type Database = {
             foreignKeyName: "annonces_cree_par_fkey"
             columns: ["cree_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "annonces_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -153,6 +160,13 @@ export type Database = {
             foreignKeyName: "audit_log_acteur_id_fkey"
             columns: ["acteur_id"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "audit_log_acteur_id_fkey"
+            columns: ["acteur_id"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -199,6 +213,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "caisses_dahira_id_fkey"
+            columns: ["dahira_id"]
+            isOneToOne: false
+            referencedRelation: "dahiras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories_membre: {
+        Row: {
+          actif: boolean
+          code: string
+          cotisation_mensuelle: number | null
+          dahira_id: string
+          id: string
+          nom: string
+          ordre: number
+        }
+        Insert: {
+          actif?: boolean
+          code: string
+          cotisation_mensuelle?: number | null
+          dahira_id: string
+          id?: string
+          nom: string
+          ordre?: number
+        }
+        Update: {
+          actif?: boolean
+          code?: string
+          cotisation_mensuelle?: number | null
+          dahira_id?: string
+          id?: string
+          nom?: string
+          ordre?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_membre_dahira_id_fkey"
             columns: ["dahira_id"]
             isOneToOne: false
             referencedRelation: "dahiras"
@@ -363,11 +415,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "declarations_ecriture_id_fkey"
+            columns: ["ecriture_id"]
+            isOneToOne: false
+            referencedRelation: "v_ecritures_effectives"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "declarations_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "declarations_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "declarations_membre_id_fkey"
@@ -382,6 +448,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "declarations_traitee_par_fkey"
+            columns: ["traitee_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "declarations_traitee_par_fkey"
@@ -472,6 +545,13 @@ export type Database = {
             foreignKeyName: "demandes_sociales_decidee_par_fkey"
             columns: ["decidee_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "demandes_sociales_decidee_par_fkey"
+            columns: ["decidee_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -483,11 +563,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "demandes_sociales_ecriture_id_fkey"
+            columns: ["ecriture_id"]
+            isOneToOne: false
+            referencedRelation: "v_ecritures_effectives"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "demandes_sociales_instruite_par_fkey"
             columns: ["instruite_par"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandes_sociales_instruite_par_fkey"
+            columns: ["instruite_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "demandes_sociales_instruite_par_fkey"
@@ -502,6 +596,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandes_sociales_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "demandes_sociales_membre_id_fkey"
@@ -516,6 +617,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandes_sociales_soumise_par_fkey"
+            columns: ["soumise_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "demandes_sociales_soumise_par_fkey"
@@ -536,6 +644,7 @@ export type Database = {
           dahira_id: string
           date_depense: string
           ecriture_id: string | null
+          evenement_id: string | null
           id: string
           justificatif_url: string | null
           mode: Database["public"]["Enums"]["mode_paiement"]
@@ -555,6 +664,7 @@ export type Database = {
           dahira_id: string
           date_depense?: string
           ecriture_id?: string | null
+          evenement_id?: string | null
           id?: string
           justificatif_url?: string | null
           mode: Database["public"]["Enums"]["mode_paiement"]
@@ -574,6 +684,7 @@ export type Database = {
           dahira_id?: string
           date_depense?: string
           ecriture_id?: string | null
+          evenement_id?: string | null
           id?: string
           justificatif_url?: string | null
           mode?: Database["public"]["Enums"]["mode_paiement"]
@@ -610,6 +721,13 @@ export type Database = {
             foreignKeyName: "depenses_cree_par_fkey"
             columns: ["cree_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "depenses_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -628,11 +746,46 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "depenses_ecriture_id_fkey"
+            columns: ["ecriture_id"]
+            isOneToOne: false
+            referencedRelation: "v_ecritures_effectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "depenses_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "evenements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "depenses_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "depenses_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
+          },
+          {
             foreignKeyName: "depenses_validee_par_fkey"
             columns: ["validee_par"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "depenses_validee_par_fkey"
+            columns: ["validee_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "depenses_validee_par_fkey"
@@ -654,6 +807,7 @@ export type Database = {
           date_operation: string
           declaration_id: string | null
           depense_id: string | null
+          evenement_id: string | null
           id: string
           libelle: string
           membre_id: string | null
@@ -674,6 +828,7 @@ export type Database = {
           date_operation?: string
           declaration_id?: string | null
           depense_id?: string | null
+          evenement_id?: string | null
           id?: string
           libelle: string
           membre_id?: string | null
@@ -694,6 +849,7 @@ export type Database = {
           date_operation?: string
           declaration_id?: string | null
           depense_id?: string | null
+          evenement_id?: string | null
           id?: string
           libelle?: string
           membre_id?: string | null
@@ -710,6 +866,13 @@ export type Database = {
             columns: ["annule_ecriture_id"]
             isOneToOne: false
             referencedRelation: "ecritures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_annule_ecriture_id_fkey"
+            columns: ["annule_ecriture_id"]
+            isOneToOne: false
+            referencedRelation: "v_ecritures_effectives"
             referencedColumns: ["id"]
           },
           {
@@ -737,6 +900,13 @@ export type Database = {
             foreignKeyName: "ecritures_cree_par_fkey"
             columns: ["cree_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "ecritures_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -748,11 +918,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "ecritures_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "evenements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "ecritures_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
+          },
+          {
             foreignKeyName: "ecritures_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "ecritures_membre_id_fkey"
@@ -791,14 +989,66 @@ export type Database = {
           },
         ]
       }
+      evenement_parts: {
+        Row: {
+          categorie_id: string
+          evenement_id: string
+          montant: number
+        }
+        Insert: {
+          categorie_id: string
+          evenement_id: string
+          montant: number
+        }
+        Update: {
+          categorie_id?: string
+          evenement_id?: string
+          montant?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evenement_parts_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "categories_membre"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evenement_parts_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "evenements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evenement_parts_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "evenement_parts_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
+          },
+        ]
+      }
       evenements: {
         Row: {
           annule: boolean
+          budget: number | null
+          caisse_id: string | null
+          cloture: boolean
+          contribution_par_membre: number | null
           cree_le: string
           cree_par: string
           dahira_id: string
           debut_le: string
           description: string | null
+          est_gamou: boolean
           fin_le: string | null
           id: string
           latitude: number | null
@@ -809,11 +1059,16 @@ export type Database = {
         }
         Insert: {
           annule?: boolean
+          budget?: number | null
+          caisse_id?: string | null
+          cloture?: boolean
+          contribution_par_membre?: number | null
           cree_le?: string
           cree_par: string
           dahira_id: string
           debut_le: string
           description?: string | null
+          est_gamou?: boolean
           fin_le?: string | null
           id?: string
           latitude?: number | null
@@ -824,11 +1079,16 @@ export type Database = {
         }
         Update: {
           annule?: boolean
+          budget?: number | null
+          caisse_id?: string | null
+          cloture?: boolean
+          contribution_par_membre?: number | null
           cree_le?: string
           cree_par?: string
           dahira_id?: string
           debut_le?: string
           description?: string | null
+          est_gamou?: boolean
           fin_le?: string | null
           id?: string
           latitude?: number | null
@@ -839,11 +1099,32 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "evenements_caisse_id_fkey"
+            columns: ["caisse_id"]
+            isOneToOne: false
+            referencedRelation: "caisses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evenements_caisse_id_fkey"
+            columns: ["caisse_id"]
+            isOneToOne: false
+            referencedRelation: "v_soldes_caisses"
+            referencedColumns: ["caisse_id"]
+          },
+          {
             foreignKeyName: "evenements_cree_par_fkey"
             columns: ["cree_par"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evenements_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "evenements_cree_par_fkey"
@@ -898,6 +1179,13 @@ export type Database = {
             foreignKeyName: "membre_roles_attribue_par_fkey"
             columns: ["attribue_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "membre_roles_attribue_par_fkey"
+            columns: ["attribue_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -919,6 +1207,13 @@ export type Database = {
             foreignKeyName: "membre_roles_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "membre_roles_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -926,6 +1221,7 @@ export type Database = {
       }
       membres: {
         Row: {
+          categorie_id: string | null
           cotisation_mensuelle: number | null
           cree_le: string
           cree_par: string | null
@@ -947,6 +1243,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          categorie_id?: string | null
           cotisation_mensuelle?: number | null
           cree_le?: string
           cree_par?: string | null
@@ -968,6 +1265,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          categorie_id?: string | null
           cotisation_mensuelle?: number | null
           cree_le?: string
           cree_par?: string | null
@@ -990,11 +1288,25 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "membres_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "categories_membre"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "membres_cree_par_fkey"
             columns: ["cree_par"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membres_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "membres_cree_par_fkey"
@@ -1066,6 +1378,13 @@ export type Database = {
             foreignKeyName: "page_histoire_modifie_par_fkey"
             columns: ["modifie_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "page_histoire_modifie_par_fkey"
+            columns: ["modifie_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -1102,11 +1421,32 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "participations_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "participations_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
+          },
+          {
             foreignKeyName: "participations_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participations_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "participations_membre_id_fkey"
@@ -1152,6 +1492,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "periodes_cloturee_par_fkey"
+            columns: ["cloturee_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "periodes_cloturee_par_fkey"
@@ -1222,11 +1569,32 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "presences_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "presences_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
+          },
+          {
             foreignKeyName: "presences_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presences_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "presences_membre_id_fkey"
@@ -1241,6 +1609,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presences_pointe_par_fkey"
+            columns: ["pointe_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "presences_pointe_par_fkey"
@@ -1339,6 +1714,13 @@ export type Database = {
             foreignKeyName: "qr_tokens_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "qr_tokens_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -1424,6 +1806,13 @@ export type Database = {
             foreignKeyName: "rapprochements_saisi_par_fkey"
             columns: ["saisi_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "rapprochements_saisi_par_fkey"
+            columns: ["saisi_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -1476,11 +1865,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "recus_ecriture_id_fkey"
+            columns: ["ecriture_id"]
+            isOneToOne: true
+            referencedRelation: "v_ecritures_effectives"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "recus_membre_id_fkey"
             columns: ["membre_id"]
             isOneToOne: false
             referencedRelation: "membres"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recus_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
           },
           {
             foreignKeyName: "recus_membre_id_fkey"
@@ -1606,6 +2009,13 @@ export type Database = {
             foreignKeyName: "virements_cree_par_fkey"
             columns: ["cree_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "virements_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -1627,6 +2037,13 @@ export type Database = {
             foreignKeyName: "virements_valide_par_fkey"
             columns: ["valide_par"]
             isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "virements_valide_par_fkey"
+            columns: ["valide_par"]
+            isOneToOne: false
             referencedRelation: "v_situation_membres"
             referencedColumns: ["membre_id"]
           },
@@ -1634,6 +2051,240 @@ export type Database = {
       }
     }
     Views: {
+      v_bilan_evenements: {
+        Row: {
+          a_des_parts: boolean | null
+          budget: number | null
+          cloture: boolean | null
+          collecte: number | null
+          contribution_par_membre: number | null
+          dahira_id: string | null
+          debut_le: string | null
+          depense: number | null
+          est_gamou: boolean | null
+          evenement_id: string | null
+          nb_contributeurs: number | null
+          reste: number | null
+          titre: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evenements_dahira_id_fkey"
+            columns: ["dahira_id"]
+            isOneToOne: false
+            referencedRelation: "dahiras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_contributions_evenement: {
+        Row: {
+          attendu: number | null
+          categorie: string | null
+          evenement_id: string | null
+          membre_id: string | null
+          nom: string | null
+          numero_membre: string | null
+          prenom: string | null
+          reste: number | null
+          surnom: string | null
+          verse: number | null
+        }
+        Relationships: []
+      }
+      v_ecritures_effectives: {
+        Row: {
+          annule_ecriture_id: string | null
+          caisse_id: string | null
+          categorie: string | null
+          cree_le: string | null
+          cree_par: string | null
+          dahira_id: string | null
+          date_operation: string | null
+          declaration_id: string | null
+          depense_id: string | null
+          evenement_id: string | null
+          id: string | null
+          libelle: string | null
+          membre_id: string | null
+          mode: Database["public"]["Enums"]["mode_paiement"] | null
+          montant: number | null
+          motif_annulation: string | null
+          periode_id: string | null
+          sens: Database["public"]["Enums"]["sens_ecriture"] | null
+          virement_id: string | null
+        }
+        Insert: {
+          annule_ecriture_id?: string | null
+          caisse_id?: string | null
+          categorie?: string | null
+          cree_le?: string | null
+          cree_par?: string | null
+          dahira_id?: string | null
+          date_operation?: string | null
+          declaration_id?: string | null
+          depense_id?: string | null
+          evenement_id?: string | null
+          id?: string | null
+          libelle?: string | null
+          membre_id?: string | null
+          mode?: Database["public"]["Enums"]["mode_paiement"] | null
+          montant?: number | null
+          motif_annulation?: string | null
+          periode_id?: string | null
+          sens?: Database["public"]["Enums"]["sens_ecriture"] | null
+          virement_id?: string | null
+        }
+        Update: {
+          annule_ecriture_id?: string | null
+          caisse_id?: string | null
+          categorie?: string | null
+          cree_le?: string | null
+          cree_par?: string | null
+          dahira_id?: string | null
+          date_operation?: string | null
+          declaration_id?: string | null
+          depense_id?: string | null
+          evenement_id?: string | null
+          id?: string | null
+          libelle?: string | null
+          membre_id?: string | null
+          mode?: Database["public"]["Enums"]["mode_paiement"] | null
+          montant?: number | null
+          motif_annulation?: string | null
+          periode_id?: string | null
+          sens?: Database["public"]["Enums"]["sens_ecriture"] | null
+          virement_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecritures_annule_ecriture_id_fkey"
+            columns: ["annule_ecriture_id"]
+            isOneToOne: false
+            referencedRelation: "ecritures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_annule_ecriture_id_fkey"
+            columns: ["annule_ecriture_id"]
+            isOneToOne: false
+            referencedRelation: "v_ecritures_effectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_caisse_id_fkey"
+            columns: ["caisse_id"]
+            isOneToOne: false
+            referencedRelation: "caisses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_caisse_id_fkey"
+            columns: ["caisse_id"]
+            isOneToOne: false
+            referencedRelation: "v_soldes_caisses"
+            referencedColumns: ["caisse_id"]
+          },
+          {
+            foreignKeyName: "ecritures_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "membres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "ecritures_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "v_situation_membres"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "ecritures_dahira_id_fkey"
+            columns: ["dahira_id"]
+            isOneToOne: false
+            referencedRelation: "dahiras"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "evenements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_bilan_evenements"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "ecritures_evenement_id_fkey"
+            columns: ["evenement_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["evenement_id"]
+          },
+          {
+            foreignKeyName: "ecritures_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "membres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecritures_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_contributions_evenement"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "ecritures_membre_id_fkey"
+            columns: ["membre_id"]
+            isOneToOne: false
+            referencedRelation: "v_situation_membres"
+            referencedColumns: ["membre_id"]
+          },
+          {
+            foreignKeyName: "ecritures_periode_id_fkey"
+            columns: ["periode_id"]
+            isOneToOne: false
+            referencedRelation: "periodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ecritures_declaration"
+            columns: ["declaration_id"]
+            isOneToOne: false
+            referencedRelation: "declarations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ecritures_depense"
+            columns: ["depense_id"]
+            isOneToOne: false
+            referencedRelation: "depenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ecritures_virement"
+            columns: ["virement_id"]
+            isOneToOne: false
+            referencedRelation: "virements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_situation_membres: {
         Row: {
           a_jour: boolean | null
@@ -1695,11 +2346,51 @@ export type Database = {
         Args: { p_ecriture_id: string; p_motif: string }
         Returns: string
       }
+      bilan_gamou: {
+        Args: { p_evenement_id: string }
+        Returns: {
+          cotisations: number
+          date_debut: string
+          date_gamou: string
+          depenses: number
+          dons: number
+          report: number
+          reste: number
+        }[]
+      }
+      creer_compte_membre: {
+        Args: {
+          p_mot_de_passe: string
+          p_nom: string
+          p_prenom: string
+          p_roles?: Database["public"]["Enums"]["role_type"][]
+          p_section_nom?: string
+          p_surnom?: string
+          p_telephone: string
+        }
+        Returns: string
+      }
+      creer_evenement: {
+        Args: {
+          p_budget?: number
+          p_caisse_id: string
+          p_debut: string
+          p_description?: string
+          p_est_gamou?: boolean
+          p_lieu?: string
+          p_part_defaut?: number
+          p_parts?: Json
+          p_titre: string
+        }
+        Returns: string
+      }
       dahira_courant: { Args: never; Returns: string }
+      debut_cycle_gamou: { Args: { p_evenement_id: string }; Returns: string }
       encaisser_especes: {
         Args: {
           p_caisse_id: string
           p_date?: string
+          p_evenement_id?: string
           p_libelle?: string
           p_membre_id: string
           p_montant: number
@@ -1710,6 +2401,22 @@ export type Database = {
           recu_id: string
         }[]
       }
+      enregistrer_depense: {
+        Args: {
+          p_beneficiaire: string
+          p_caisse_id: string
+          p_categorie?: string
+          p_date?: string
+          p_evenement_id?: string
+          p_mode: Database["public"]["Enums"]["mode_paiement"]
+          p_montant: number
+          p_motif: string
+        }
+        Returns: {
+          depense_id: string
+          statut: Database["public"]["Enums"]["statut_depense"]
+        }[]
+      }
       generer_recu: { Args: { p_ecriture_id: string }; Returns: string }
       membre_courant: { Args: never; Returns: string }
       membre_texte_recherche: {
@@ -1717,6 +2424,10 @@ export type Database = {
         Returns: string
       }
       normaliser_texte: { Args: { p_texte: string }; Returns: string }
+      passer_depense_au_journal: {
+        Args: { p_depense_id: string }
+        Returns: string
+      }
       periode_pour_date: {
         Args: { p_dahira_id: string; p_date: string }
         Returns: string
@@ -1732,13 +2443,36 @@ export type Database = {
           section: string
         }[]
       }
+      rejeter_depense: {
+        Args: { p_depense_id: string; p_motif: string }
+        Returns: undefined
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      situation_gamou: {
+        Args: { p_evenement_id: string }
+        Returns: {
+          attendu_cycle: number
+          categorie: string
+          cotisation: number
+          membre_id: string
+          mois_cycle: number
+          nom: string
+          numero_membre: string
+          prenom: string
+          reste: number
+          surnom: string
+          total_du: number
+          total_verse: number
+        }[]
+      }
+      solde_caisse: { Args: { p_caisse_id: string }; Returns: number }
       unaccent: { Args: { "": string }; Returns: string }
       valider_declaration: {
         Args: { p_declaration_id: string }
         Returns: string
       }
+      valider_depense: { Args: { p_depense_id: string }; Returns: undefined }
     }
     Enums: {
       mode_paiement:

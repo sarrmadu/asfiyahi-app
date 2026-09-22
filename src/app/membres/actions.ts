@@ -25,6 +25,7 @@ export async function enregistrerMembre(
   const surnom = texte('surnom') || null
   const telSaisi = texte('telephone')
   const sectionId = texte('section_id') || null
+  const categorieId = texte('categorie_id') || null
   const dateAdhesion = texte('date_adhesion')
   const cotiSaisie = texte('cotisation').replace(/\D/g, '')
   const statut = (texte('statut') || 'actif') as Statut
@@ -70,6 +71,7 @@ export async function enregistrerMembre(
     surnom,
     telephone,
     section_id: sectionId,
+    categorie_id: categorieId,
     date_adhesion: dateAdhesion,
     cotisation_mensuelle: cotisation,
     notes,

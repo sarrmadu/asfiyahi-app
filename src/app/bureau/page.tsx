@@ -115,6 +115,27 @@ export default async function PageBureau() {
         </Button>
       </Link>
 
+      <Link href="/evenements" className="-mt-3 mb-6 block">
+        <Button variant="outline" className="h-14 w-full text-base">
+          Événements
+        </Button>
+      </Link> 
+
+      {aRole(membre, ['president']) && (
+        <Link href="/categories" className="-mt-3 mb-6 block">
+          <Button variant="outline" className="h-14 w-full text-base">
+            Catégories et cotisations
+          </Button>
+        </Link>
+      )} 
+      {voitFinances && (
+        <Link href="/depenses" className="-mt-3 mb-6 block">
+          <Button variant="outline" className="h-14 w-full text-base">
+            Dépenses
+          </Button>
+        </Link>
+      )}
+
       {voitFinances && (
         <section className="mb-8">
           <div className="mb-3 flex items-baseline justify-between">

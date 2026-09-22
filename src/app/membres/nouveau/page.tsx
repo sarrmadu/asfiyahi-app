@@ -9,9 +9,14 @@ export default async function PageNouveauMembre() {
   await exigerRole(['president', 'secretaire'])
   const supabase = await createClient()
 
-  const [{ data: sections }, { data: dahira }] = await Promise.all([
+  const [{ data: sections }, { data: dahira }, { data: categories }] = await Promise.all([
     supabase.from('sections').select('id, nom').eq('actif', true).order('ordre'),
     supabase.from('dahiras').select('cotisation_defaut').single(),
+    supabase
+      .from('categories_membre')
+      .select('id, nom, cotisation_mensuelle')
+      .eq('actif', true)
+      .order('ordre'),
   ])
 
   return (
@@ -28,6 +33,7 @@ export default async function PageNouveauMembre() {
 
       <FormulaireMembre
         sections={sections ?? []}
+        categories={categories ?? []}
         cotisationDefaut={dahira?.cotisation_defaut ?? 100000}
       />
     </main>

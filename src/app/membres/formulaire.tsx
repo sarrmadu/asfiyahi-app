@@ -16,6 +16,7 @@ export type MembreEdite = {
   surnom: string | null
   telephone: string | null
   section_id: string | null
+  categorie_id: string | null
   date_adhesion: string
   cotisation_mensuelle: number | null
   statut: string
@@ -34,13 +35,17 @@ function BoutonEnregistrer({ creation }: { creation: boolean }) {
   )
 }
 
+export type Categorie = { id: string; nom: string; cotisation_mensuelle: number | null }
+
 export function FormulaireMembre({
   membre,
   sections,
+  categories,
   cotisationDefaut,
 }: {
   membre?: MembreEdite
   sections: { id: string; nom: string }[]
+  categories: Categorie[]
   cotisationDefaut: number
 }) {
   const [etat, action] = useActionState<EtatFormulaire, FormData>(enregistrerMembre, {})
@@ -89,6 +94,26 @@ export function FormulaireMembre({
         />
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="categorie_id" className="text-base">Catégorie</Label>
+        <select
+          id="categorie_id"
+          name="categorie_id"
+          defaultValue={membre?.categorie_id ?? ''}
+          className={classeSelect}
+        >
+          <option value="">— Choisir —</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nom} (coti {formaterMontant(c.cotisation_mensuelle ?? cotisationDefaut)})
+            </option>
+          ))}
+        </select>
+        <p className="text-sm text-muted-foreground">
+          Détermine sa cotisation mensuelle et sa part lors des événements.
+        </p>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="section_id" className="text-base">Section</Label>
@@ -118,7 +143,7 @@ export function FormulaireMembre({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="cotisation" className="text-base">Cotisation mensuelle (F CFA)</Label>
+        <Label htmlFor="cotisation" className="text-base">Cotisation particulière (F CFA)</Label>
         <Input
           id="cotisation"
           name="cotisation"
@@ -126,11 +151,12 @@ export function FormulaireMembre({
           defaultValue={
             membre?.cotisation_mensuelle != null ? String(membre.cotisation_mensuelle / 100) : ''
           }
-          placeholder={`${formaterMontant(cotisationDefaut)} (montant habituel)`}
+          placeholder="Montant de la catégorie"
           className="h-12"
         />
         <p className="text-sm text-muted-foreground">
-          Laissez vide pour appliquer le montant habituel du dahira.
+          À remplir seulement pour une exception décidée par le bureau. Sinon, laissez vide :
+          le montant de la catégorie s&apos;applique.
         </p>
       </div>
 

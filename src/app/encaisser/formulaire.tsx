@@ -11,6 +11,14 @@ import { encaisser } from './actions'
 
 type Caisse = { id: string; nom: string; type: string }
 
+export type EvenementOuvert = {
+  id: string
+  titre: string
+  caisse_id: string | null
+  est_gamou: boolean
+  a_des_parts: boolean
+}
+
 type MembreTrouve = {
   membre_id: string
   numero_membre: string
@@ -19,12 +27,20 @@ type MembreTrouve = {
   cotisation: number
 }
 
-type Encaisse = { numeroRecu: string; nom: string; montant: number; caisse: string }
+type Encaisse = { numeroRecu: string; nom: string; montant: number; objet: string }
 
 const MOIS = [1, 2, 3, 6, 12]
 const MONTANTS_USUELS = [500, 1000, 2000, 5000]
 
-export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
+export function FormulaireEncaissement({
+  caisses,
+  evenements,
+  evenementInitial,
+}: {
+  caisses: Caisse[]
+  evenements: EvenementOuvert[]
+  evenementInitial?: string
+}) {
   const [supabase] = useState(() => createClient())
   const rechercheRef = useRef<HTMLInputElement>(null)
   const derniereRequete = useRef(0)
@@ -34,13 +50,20 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
   const [recherche, setRecherche] = useState(false)
   const [membre, setMembre] = useState<MembreTrouve | null>(null)
 
+  const [evenementId, setEvenementId] = useState(
+    evenements.some((e) => e.id === evenementInitial) ? evenementInitial! : ''
+  )
+  const evenement = evenements.find((e) => e.id === evenementId) ?? null
+
   const caisseParDefaut = caisses.find((c) => c.type === 'mensualites') ?? caisses[0]
-  const [caisseId, setCaisseId] = useState(caisseParDefaut.id)
+  const [caisseChoisie, setCaisseChoisie] = useState(caisseParDefaut.id)
+  const caisseId = evenement?.caisse_id ?? caisseChoisie
   const caisse = caisses.find((c) => c.id === caisseId) ?? caisseParDefaut
-  const estMensualites = caisse.type === 'mensualites'
+  const estMensualites = !evenement && caisse.type === 'mensualites'
 
   const [montant, setMontant] = useState('')
   const [mois, setMois] = useState<number | null>(null)
+  const [infoPart, setInfoPart] = useState<string | null>(null)
 
   const [enCours, startTransition] = useTransition()
   const [session, setSession] = useState<Encaisse[]>([])
@@ -78,13 +101,60 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
     }
   }
 
+  async function preremplir(m: MembreTrouve | null, evt: EvenementOuvert | null, c: Caisse) {
+    setInfoPart(null)
+    if (!m) {
+      setMontant('')
+      setMois(null)
+      return
+    }
+    if (evt?.a_des_parts) {
+      const { data } = await supabase
+        .from('v_contributions_evenement')
+        .select('verse, reste')
+        .eq('evenement_id', evt.id)
+        .eq('membre_id', m.membre_id)
+        .maybeSingle()
+      setMois(null)
+      if (!data) {
+        setMontant('')
+        setInfoPart('Aucune part prévue pour ce membre (vérifiez sa catégorie). Le versement sera un don.')
+        return
+      }
+      const reste = Number(data.reste ?? 0)
+      const verse = Number(data.verse ?? 0)
+      if (reste > 0) {
+        setMontant(String(reste / 100))
+        setInfoPart(
+          verse > 0
+            ? `Part : déjà ${formaterMontant(verse)} versés, reste ${formaterMontant(reste)}`
+            : `Part à verser : ${formaterMontant(reste)}`
+        )
+      } else {
+        setMontant('')
+        setInfoPart(`Part déjà réglée (${formaterMontant(verse)}). Tout versement sera un don.`)
+      }
+      return
+    }
+    if (evt?.est_gamou) {
+      setMois(null)
+      setMontant('')
+      setInfoPart('Don pour le Gamou. Pour une cotisation mensuelle, choisissez « Cotisation ou caisse habituelle ».')
+      return
+    }
+    if (!evt && c.type === 'mensualites') {
+      setMois(1)
+      setMontant(String(m.cotisation / 100))
+      return
+    }
+    setMois(null)
+    setMontant('')
+  }
+
   function choisirMembre(m: MembreTrouve) {
     setMembre(m)
     setResultats([])
-    if (estMensualites) {
-      setMois(1)
-      setMontant(String(m.cotisation / 100))
-    }
+    void preremplir(m, evenement, caisse)
   }
 
   function changerMembre() {
@@ -92,18 +162,20 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
     setTerme('')
     setMontant('')
     setMois(null)
+    setInfoPart(null)
     requestAnimationFrame(() => rechercheRef.current?.focus())
   }
 
+  function choisirEvenement(id: string) {
+    setEvenementId(id)
+    const evt = evenements.find((e) => e.id === id) ?? null
+    const c = caisses.find((x) => x.id === (evt?.caisse_id ?? caisseChoisie)) ?? caisseParDefaut
+    void preremplir(membre, evt, c)
+  }
+
   function choisirCaisse(c: Caisse) {
-    setCaisseId(c.id)
-    if (c.type === 'mensualites' && membre) {
-      setMois(1)
-      setMontant(String(membre.cotisation / 100))
-    } else {
-      setMois(null)
-      setMontant('')
-    }
+    setCaisseChoisie(c.id)
+    void preremplir(membre, null, c)
   }
 
   function choisirMois(n: number) {
@@ -113,6 +185,8 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
   }
 
   function libelle(): string {
+    if (evenement?.est_gamou) return `Don — ${evenement.titre}`
+    if (evenement) return `${evenement.titre} — versement en espèces`
     if (estMensualites) {
       return mois ? `Cotisation en espèces — ${mois} mois` : 'Cotisation en espèces'
     }
@@ -123,7 +197,7 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
     if (!membre || montantCentimes <= 0) return
     const m = membre
     const montantValide = montantCentimes
-    const nomCaisse = caisse.nom
+    const objet = evenement?.titre ?? caisse.nom
 
     startTransition(async () => {
       const r = await encaisser({
@@ -131,6 +205,7 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
         caisseId: caisse.id,
         montantCentimes: montantValide,
         libelle: libelle(),
+        evenementId: evenement?.id ?? null,
       })
 
       if (!r.ok) {
@@ -140,7 +215,7 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
 
       toast.success(`Reçu ${r.numeroRecu} — ${formaterMontant(montantValide)}`)
       setSession((s) => [
-        { numeroRecu: r.numeroRecu, nom: m.nom_affiche, montant: montantValide, caisse: nomCaisse },
+        { numeroRecu: r.numeroRecu, nom: m.nom_affiche, montant: montantValide, objet },
         ...s,
       ])
       changerMembre()
@@ -151,6 +226,29 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
 
   return (
     <div className="space-y-6">
+      {evenements.length > 0 && (
+        <section className="space-y-2">
+          <Label htmlFor="evenement" className="text-base">
+            Versement pour
+          </Label>
+          <select
+            id="evenement"
+            value={evenementId}
+            onChange={(e) => choisirEvenement(e.target.value)}
+            disabled={enCours}
+            className="h-12 w-full rounded-lg border border-input bg-background px-3 text-base focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="">Cotisation ou caisse habituelle</option>
+            {evenements.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.est_gamou ? `Don pour ${e.titre}` : e.titre}
+                {e.a_des_parts ? ' (parts par catégorie)' : ''}
+              </option>
+            ))}
+          </select>
+        </section>
+      )}
+
       <section className="space-y-2">
         <Label htmlFor="recherche" className="text-base">
           Membre
@@ -163,7 +261,7 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
               <p className="text-sm text-muted-foreground">
                 {membre.numero_membre}
                 {membre.section ? ` · ${membre.section}` : ''}
-                {' · '}coti {formaterMontant(membre.cotisation)}
+                {!evenement ? ` · coti ${formaterMontant(membre.cotisation)}` : ''}
               </p>
             </div>
             <Button variant="outline" onClick={changerMembre} disabled={enCours}>
@@ -222,27 +320,37 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
 
       <section className="space-y-2">
         <p className="text-base font-medium">Caisse</p>
-        <div className="grid grid-cols-3 gap-2">
-          {caisses.map((c) => (
-            <Button
-              key={c.id}
-              type="button"
-              variant={c.id === caisseId ? 'default' : 'outline'}
-              aria-pressed={c.id === caisseId}
-              onClick={() => choisirCaisse(c)}
-              disabled={enCours}
-              className="h-14 whitespace-normal px-2 text-sm leading-tight"
-            >
-              {c.nom}
-            </Button>
-          ))}
-        </div>
+        {evenement ? (
+          <p className="rounded-lg bg-muted px-4 py-3 text-sm">
+            {caisse.nom}, caisse de l&apos;événement
+          </p>
+        ) : (
+          <div className="grid grid-cols-3 gap-2">
+            {caisses.map((c) => (
+              <Button
+                key={c.id}
+                type="button"
+                variant={c.id === caisseId ? 'default' : 'outline'}
+                aria-pressed={c.id === caisseId}
+                onClick={() => choisirCaisse(c)}
+                disabled={enCours}
+                className="h-14 whitespace-normal px-2 text-sm leading-tight"
+              >
+                {c.nom}
+              </Button>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="space-y-2">
         <Label htmlFor="montant" className="text-base">
           Montant (F CFA)
         </Label>
+
+        {infoPart && (
+          <p className="rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-900">{infoPart}</p>
+        )}
 
         {estMensualites ? (
           <div className="flex flex-wrap gap-2">
@@ -315,6 +423,7 @@ export function FormulaireEncaissement({ caisses }: { caisses: Caisse[] }) {
               <li key={e.numeroRecu} className="flex justify-between gap-3">
                 <span className="min-w-0 truncate">
                   <span className="text-muted-foreground">{e.numeroRecu}</span> · {e.nom}
+                  <span className="text-muted-foreground"> · {e.objet}</span>
                 </span>
                 <span className="montant shrink-0">{formaterMontant(e.montant)}</span>
               </li>
