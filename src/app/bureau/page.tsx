@@ -135,6 +135,13 @@ export default async function PageBureau() {
           </Button>
         </Link>
       )}
+      {membre.roles.includes('president') && (
+        <Link href="/roles" className="mb-3 block">
+          <Button variant="outline" className="h-14 w-full text-base">
+            Accès et rôles
+          </Button>
+        </Link>
+      )}
 
       {voitFinances && (
         <Link href="/depenses" className="-mt-3 mb-6 block">

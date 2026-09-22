@@ -2452,6 +2452,13 @@ export type Database = {
         }
         Returns: string
       }
+      definir_roles: {
+        Args: {
+          p_membre_id: string
+          p_roles: Database["public"]["Enums"]["role_type"][]
+        }
+        Returns: undefined
+      }
       encaisser_especes: {
         Args: {
           p_caisse_id: string
