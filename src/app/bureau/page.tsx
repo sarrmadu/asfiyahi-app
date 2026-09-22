@@ -98,8 +98,15 @@ export default async function PageBureau() {
         <Link href="/encaisser" className="mb-6 block">
           <Button className="h-14 w-full text-base font-semibold">Encaisser des espèces</Button>
         </Link>
+        
       )}
-
+      
+      <Link href="/membres" className="mb-6 block">
+        <Button variant="outline" className="h-14 w-full text-base">
+          Membres
+        </Button>
+      </Link>
+      
       {voitFinances && (
         <section className="mb-8">
           <div className="mb-3 flex items-baseline justify-between">
