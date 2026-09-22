@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 
 export type ResultatEncaissement =
-  | { ok: true; numeroRecu: string }
+  | { ok: true; numeroRecu: string; recuId: string }
   | { ok: false; erreur: string }
 
 const MONTANT_MAX = 10_000_000 * 100
@@ -42,12 +42,13 @@ export async function encaisser(entree: {
   }
 
   const numeroRecu = data?.[0]?.numero_recu
-  if (!numeroRecu) {
+  const recuId = data?.[0]?.recu_id
+  if (!numeroRecu || !recuId) {
     return { ok: false, erreur: 'Encaissement non confirmé. Vérifiez le journal avant de recommencer.' }
   }
 
   revalidatePath('/')
   revalidatePath('/bureau')
   revalidatePath('/evenements', 'layout')
-  return { ok: true, numeroRecu }
+  return { ok: true, numeroRecu, recuId }
 }

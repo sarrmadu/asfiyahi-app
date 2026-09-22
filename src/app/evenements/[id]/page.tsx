@@ -4,7 +4,7 @@ import { aRole, exigerRole } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { formaterMontant, nomAffiche } from '@/lib/format'
 import { Button } from '@/components/ui/button'
-
+import { BoutonPdf } from '@/components/bouton-pdf'
 export const metadata = { title: 'Événement' }
 
 const dateLongue = new Intl.DateTimeFormat('fr-FR', {
@@ -290,7 +290,34 @@ export default async function PageEvenement({ params }: { params: Promise<{ id: 
         </div>
       )}
 
-      {cartes}
+            {cartes}
+
+      {voitFinances && (
+        <section className="mb-8 rounded-xl border p-4">
+          <p className="font-semibold">Bilan de l&apos;événement</p>
+          <p className="mb-3 text-sm text-muted-foreground">
+            Un PDF avec les chiffres, les versements des membres et les dépenses, à partager
+            au bureau ou dans le groupe WhatsApp du dahira.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BoutonPdf
+              url={`/evenements/${evt.id}/bilan`}
+              nomFichier={`Bilan-${evt.titre.replace(/\s+/g, '-')}.pdf`}
+              titre={`Bilan ${evt.titre}`}
+              libelle="Partager le bilan"
+              variante="default"
+              className="h-12 w-full text-base"
+            />
+            <BoutonPdf
+              url={`/evenements/${evt.id}/bilan?membres=0`}
+              nomFichier={`Bilan-${evt.titre.replace(/\s+/g, '-')}.pdf`}
+              titre={`Bilan ${evt.titre}`}
+              libelle="Sans la liste des membres"
+              className="h-12 w-full text-base"
+            />
+          </div>
+        </section>
+      )}
       {membres}
 
       {voitFinances && (

@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { formaterMontant, francsEnCentimes } from '@/lib/format'
+import { BoutonRecu } from '@/components/bouton-recu'
 import { encaisser } from './actions'
-
 type Caisse = { id: string; nom: string; type: string }
 
 export type EvenementOuvert = {
@@ -27,8 +27,7 @@ type MembreTrouve = {
   cotisation: number
 }
 
-type Encaisse = { numeroRecu: string; nom: string; montant: number; objet: string }
-
+type Encaisse = { recuId: string; numeroRecu: string; nom: string; montant: number; objet: string }
 const MOIS = [1, 2, 3, 6, 12]
 const MONTANTS_USUELS = [500, 1000, 2000, 5000]
 
@@ -215,17 +214,34 @@ export function FormulaireEncaissement({
 
       toast.success(`Reçu ${r.numeroRecu} — ${formaterMontant(montantValide)}`)
       setSession((s) => [
-        { numeroRecu: r.numeroRecu, nom: m.nom_affiche, montant: montantValide, objet },
+        { recuId: r.recuId, numeroRecu: r.numeroRecu, nom: m.nom_affiche, montant: montantValide, objet },
         ...s,
       ])
       changerMembre()
     })
   }
 
-  const totalSession = session.reduce((t, e) => t + e.montant, 0)
+    const totalSession = session.reduce((t, e) => t + e.montant, 0)
+  const dernier = session[0] ?? null
 
   return (
     <div className="space-y-6">
+      {/* DERNIER REÇU ------------------------------------------------------- */}
+      {dernier && (
+        <section className="rounded-xl border-2 border-primary bg-primary/5 p-4">
+          <p className="text-sm text-muted-foreground">Encaissé · reçu {dernier.numeroRecu}</p>
+          <p className="truncate font-semibold">{dernier.nom}</p>
+          <p className="montant mb-3 text-xl text-primary">{formaterMontant(dernier.montant)}</p>
+          <BoutonRecu
+            key={dernier.recuId}
+            recuId={dernier.recuId}
+            numero={dernier.numeroRecu}
+            precharger
+            variante="default"
+            className="h-12 w-full text-base font-semibold"
+          />
+        </section>
+      )}
       {evenements.length > 0 && (
         <section className="space-y-2">
           <Label htmlFor="evenement" className="text-base">
@@ -420,12 +436,15 @@ export function FormulaireEncaissement({
           </div>
           <ul className="space-y-2 text-sm">
             {session.map((e) => (
-              <li key={e.numeroRecu} className="flex justify-between gap-3">
+                            <li key={e.numeroRecu} className="flex items-center justify-between gap-3">
                 <span className="min-w-0 truncate">
                   <span className="text-muted-foreground">{e.numeroRecu}</span> · {e.nom}
                   <span className="text-muted-foreground"> · {e.objet}</span>
                 </span>
-                <span className="montant shrink-0">{formaterMontant(e.montant)}</span>
+                <span className="flex shrink-0 items-center gap-2">
+                  <span className="montant">{formaterMontant(e.montant)}</span>
+                  <BoutonRecu recuId={e.recuId} numero={e.numeroRecu} variante="ghost" libelle="Reçu" />
+                </span>
               </li>
             ))}
           </ul>
