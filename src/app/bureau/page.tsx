@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formaterMontant, nomAffiche } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { BoutonAnnuler } from './bouton-annuler'
 
 export const metadata = { title: 'Espace bureau' }
 
@@ -20,6 +21,23 @@ const dateCourte = new Intl.DateTimeFormat('fr-FR', {
 function premier<T>(v: T | T[] | null | undefined): T | null {
   if (!v) return null
   return Array.isArray(v) ? (v[0] ?? null) : v
+}
+
+type LigneJournal = {
+  id: string
+  cree_le: string
+  sens: string
+  montant: number
+  mode: string
+  libelle: string
+  annule_ecriture_id: string | null
+  motif_annulation: string | null
+  caisses: { nom: string } | { nom: string }[] | null
+  membres:
+    | { prenom: string; nom: string; surnom: string | null }
+    | { prenom: string; nom: string; surnom: string | null }[]
+    | null
+  recus: { numero: string } | { numero: string }[] | null
 }
 
 export default async function PageBureau() {
@@ -47,10 +65,10 @@ export default async function PageBureau() {
       ? supabase
           .from('ecritures')
           .select(
-            'id, cree_le, sens, montant, mode, libelle, annule_ecriture_id, caisses(nom), membres!ecritures_membre_id_fkey(prenom, nom, surnom), recus(numero)'
+            'id, cree_le, sens, montant, mode, libelle, annule_ecriture_id, motif_annulation, caisses(nom), membres!ecritures_membre_id_fkey(prenom, nom, surnom), recus(numero)'
           )
           .order('cree_le', { ascending: false })
-          .limit(10)
+          .limit(15)
       : null,
     voitFinances
       ? supabase
@@ -65,22 +83,13 @@ export default async function PageBureau() {
   )
   const total = listeSoldes.reduce((t, s) => t + Number(s.solde ?? 0), 0)
 
-  type LigneJournal = {
-    id: string
-    cree_le: string
-    sens: string
-    montant: number
-    mode: string
-    libelle: string
-    annule_ecriture_id: string | null
-    caisses: { nom: string } | { nom: string }[] | null
-    membres:
-      | { prenom: string; nom: string; surnom: string | null }
-      | { prenom: string; nom: string; surnom: string | null }[]
-      | null
-    recus: { numero: string } | { numero: string }[] | null
-  }
   const journal = (ecritures?.data ?? []) as unknown as LigneJournal[]
+
+  const ids = journal.map((e) => e.id)
+  const { data: annulations } = ids.length
+    ? await supabase.from('ecritures').select('annule_ecriture_id').in('annule_ecriture_id', ids)
+    : { data: [] as { annule_ecriture_id: string | null }[] }
+  const annulees = new Set((annulations ?? []).map((a) => a.annule_ecriture_id))
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-2xl px-4 pb-16 pt-4">
@@ -95,18 +104,17 @@ export default async function PageBureau() {
       </header>
 
       {peutEncaisser && (
-        <Link href="/encaisser" className="mb-6 block">
+        <Link href="/encaisser" className="mb-3 block">
           <Button className="h-14 w-full text-base font-semibold">Encaisser des espèces</Button>
         </Link>
-        
       )}
-      
+
       <Link href="/membres" className="mb-6 block">
         <Button variant="outline" className="h-14 w-full text-base">
           Membres
         </Button>
       </Link>
-      
+
       {voitFinances && (
         <section className="mb-8">
           <div className="mb-3 flex items-baseline justify-between">
@@ -158,7 +166,10 @@ export default async function PageBureau() {
         ) : (
           <ul className="divide-y rounded-xl border">
             {(retards.data ?? []).map((r) => (
-              <li key={r.membre_id ?? r.numero_membre} className="flex items-center justify-between gap-3 px-4 py-3">
+              <li
+                key={r.membre_id ?? r.numero_membre}
+                className="flex items-center justify-between gap-3 px-4 py-3"
+              >
                 <span className="min-w-0 truncate">
                   {nomAffiche({ prenom: r.prenom ?? '', nom: r.nom ?? '', surnom: r.surnom })}
                   <span className="ml-2 text-sm text-muted-foreground">{r.numero_membre}</span>
@@ -185,28 +196,54 @@ export default async function PageBureau() {
                 const entree = e.sens === 'recette' || e.sens === 'virement_entrant'
                 const m = premier(e.membres)
                 const recu = premier(e.recus)
+                const estAnnulation = e.annule_ecriture_id !== null
+                const estAnnulee = annulees.has(e.id)
+                const nom = m ? nomAffiche(m) : e.libelle
+
                 return (
-                  <li key={e.id} className="flex items-start justify-between gap-3 px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium">
-                        {m ? nomAffiche(m) : e.libelle}
-                        {e.annule_ecriture_id && (
-                          <span className="ml-2 rounded bg-destructive/10 px-1.5 py-0.5 text-xs text-destructive">
-                            annulation
-                          </span>
+                  <li key={e.id} className="px-4 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
+                          {nom}
+                          {estAnnulation && (
+                            <span className="ml-2 rounded bg-destructive/10 px-1.5 py-0.5 text-xs text-destructive">
+                              annulation
+                            </span>
+                          )}
+                          {estAnnulee && (
+                            <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                              annulée
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {dateCourte.format(new Date(e.cree_le))} · {premier(e.caisses)?.nom}
+                          {recu ? ` · ${recu.numero}` : ''}
+                        </p>
+                        {estAnnulation && e.motif_annulation && (
+                          <p className="text-sm text-muted-foreground">
+                            Motif : {e.motif_annulation}
+                          </p>
                         )}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {dateCourte.format(new Date(e.cree_le))} · {premier(e.caisses)?.nom}
-                        {recu ? ` · ${recu.numero}` : ''}
-                      </p>
+                      </div>
+                      <span
+                        className={`montant shrink-0 ${
+                          estAnnulee
+                            ? 'text-muted-foreground line-through'
+                            : entree
+                              ? 'text-primary'
+                              : 'text-destructive'
+                        }`}
+                      >
+                        {entree ? '+' : '−'}
+                        {formaterMontant(e.montant)}
+                      </span>
                     </div>
-                    <span
-                      className={`montant shrink-0 ${entree ? 'text-primary' : 'text-destructive'}`}
-                    >
-                      {entree ? '+' : '−'}
-                      {formaterMontant(e.montant)}
-                    </span>
+
+                    {peutEncaisser && !estAnnulation && !estAnnulee && (
+                      <BoutonAnnuler ecritureId={e.id} description={nom} montant={e.montant} />
+                    )}
                   </li>
                 )
               })}
